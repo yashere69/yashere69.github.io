@@ -1,0 +1,20 @@
+{
+  "name": "yashere69.github.io",
+  "private": true,
+  "description": "Yash Sharma's portfolio page: nine Python tools running in the browser.",
+  "license": "MIT",
+  "scripts": {
+    "build": "python tools/build.py",
+    "test": "python -m pytest -q tests"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/mukta": "5.3.0",
+    "pyodide": "314.0.8",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}

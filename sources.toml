@@ -1,0 +1,46 @@
+# What the page runs. Every package is built from a tagged release of its own repository,
+# and its example files come from the same checkout, so the page can't drift from the tag.
+# tools/build.py writes the resolved commit and sha256 of each file into py/manifest.json.
+
+[tools.nakli]
+tag = "v0.3.1"
+examples = []
+
+[tools.parda]
+tag = "v0.3.2"
+examples = []
+
+[tools.mixslot]
+tag = "v0.3.1"
+examples = []
+
+[tools.turncheck]
+tag = "v0.3.1"
+examples = ["examples/scenarios/*.yaml"]
+
+[tools.chatlens]
+tag = "v0.3.2"
+examples = ["examples/labels.jsonl", "examples/axial.yaml", "examples/traces.jsonl"]
+
+[tools.skill-preflight]
+tag = "v0.3.1"
+examples = ["examples/skills/**/*"]
+
+[tools.shoplint]
+tag = "v0.3.1"
+examples = ["examples/indigo-loom.csv", "examples/indigo-loom-fixed.csv"]
+
+[tools.chunkbench]
+tag = "v0.3.1"
+examples = ["examples/corpus/*"]
+
+[tools.chat2faq]
+tag = "v0.3.1"
+examples = ["examples/exports/*.txt"]
+
+# PyYAML has no pure-Python wheel and Pyodide's own build lives on a CDN this page doesn't
+# use, so the build packs PyYAML's pure-Python source (lib/yaml) from the pinned sdist.
+[pyyaml]
+version = "6.0.3"
+url = "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz"
+sha256 = "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"
