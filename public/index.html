@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' data: blob:; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Yash Sharma: tools for the AI agents Indian shops run</title>
+<meta name="description" content="Nine small Python tools for testing and hardening WhatsApp bots, voice agents and shopping assistants. All nine run in this page, in your browser.">
+<meta property="og:title" content="Yash Sharma: tools for the AI agents Indian shops run">
+<meta property="og:description" content="Nine small Python tools. All nine run in this page, in your browser.">
+<meta property="og:image" content="https://yashere69.github.io/social-preview.png">
+<meta property="og:url" content="https://yashere69.github.io/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="modulepreload" href="assets/main.js">
+<script type="module" src="assets/main.js"></script>
+</head>
+<body>
+<a class="skip" href="#tools">Skip to the tools</a>
+
+<header class="top">
+  <a class="me" href="https://github.com/yashere69">Yash Sharma</a>
+  <nav aria-label="Elsewhere">
+    <a href="#line">The line</a>
+    <a href="#tools">Tools</a>
+    <a href="#how">How this page works</a>
+    <a href="https://github.com/yashere69">GitHub</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="bench" id="bench" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <h1 id="hero-title">Tools for the AI agents Indian shops actually run.</h1>
+    <p>WhatsApp support bots, voice agents, shopping assistants: nine small Python tools for
+      testing them and keeping customers' data out of the model. Every one runs on this
+      page, in your browser. Click a machine on the bench.</p>
+    <p class="py-status" id="py-status" role="status">Python isn't loaded yet. It starts on
+      your first run (about 10 MB, then cached).</p>
+  </div>
+  <ol class="stations" id="stations" aria-label="Machines on the bench"></ol>
+</section>
+
+<section class="line" id="line" aria-labelledby="line-title">
+  <div class="line-intro">
+    <h2 id="line-title">Send a message down the line</h2>
+    <p>Customers paste phone numbers, PANs and UPI ids into support chats. parda swaps them
+      for tokens before the text reaches a model and puts them back in the reply. Models
+      rarely copy tokens exactly, so pick how this one mangles them and compare parda's
+      restore with a plain find-and-replace.</p>
+  </div>
+  <form class="line-form" id="line-form">
+    <label for="line-text">Customer message</label>
+    <textarea id="line-text" rows="3" spellcheck="false">Bhaiya order nahi aaya. Mera number ९८७६५ ४३२१० hai, PAN ABCPE1234F, refund asha.k@okicici pe kar do.</textarea>
+    <label for="line-style">The model's reply</label>
+    <select id="line-style">
+      <option>verbatim</option>
+      <option>lowercase</option>
+      <option>brackets dropped</option>
+      <option>space for underscore</option>
+      <option>markdown bold</option>
+      <option selected>label in Hindi</option>
+      <option>label and digit in Hindi</option>
+      <option>label renamed</option>
+    </select>
+    <button type="submit" class="run">Send it</button>
+  </form>
+  <ol class="line-steps" id="line-steps" aria-live="polite">
+    <li><h3>What the model sees</h3><p class="out" data-slot="redacted">Run the line to see it.</p></li>
+    <li><h3>What it writes back</h3><p class="out" data-slot="reply"></p></li>
+    <li><h3>parda's restore</h3><p class="out" data-slot="restored"></p></li>
+    <li><h3>Find-and-replace restore</h3><p class="out" data-slot="naive"></p></li>
+  </ol>
+  <p class="line-note">The "model" here is parda's own benchmark: it repeats every token
+    back, rewritten in the style you picked. No model is called and nothing leaves your
+    browser.</p>
+</section>
+
+<section class="tools" id="tools" aria-labelledby="tools-title">
+  <h2 id="tools-title">The tools</h2>
+  <p class="tools-intro">Each one is its own repository with tests, CI and a changelog, and
+    each reports the number it does worst on. They also work together: nakli generates the
+    chats chat2faq mines, chat2faq redacts with parda, and chatlens turns failed
+    conversations into turncheck tests.</p>
+
+  <article class="tool" id="nakli" data-tool="nakli">
+    <header>
+      <h3>nakli</h3><p class="gloss" lang="hi">नकली, fake</p>
+    </header>
+    <p>Seeded Indian D2C test data: customers, Shopify-style orders, Hinglish WhatsApp
+      exports and IDs. Aadhaar, GSTIN and PAN values fail their check digits on purpose,
+      so test data can never be a real person's number. Random digits pass Aadhaar's
+      Verhoeff check one time in ten.</p>
+    <p class="weak"><strong>Where it's weak:</strong> 26 customer phrasings and one store's
+      catalog. It's repetitive by design; don't train on it.</p>
+    <div class="console" data-tool="nakli"></div>
+    <p class="links"><a href="https://github.com/yashere69/nakli">github.com/yashere69/nakli</a></p>
+  </article>
+
+  <article class="tool" id="chat2faq" data-tool="chat2faq">
+    <header><h3>chat2faq</h3></header>
+    <p>Mines WhatsApp support exports into a redacted, source-linked FAQ for a support bot,
+      and flags answers that need a lookup tool rather than a fixed reply. It reads Android
+      and iOS exports in either date order. With parda installed, as here, it redacts with
+      parda.</p>
+    <p class="weak"><strong>Where it's weak:</strong> on 48 questions written independently
+      of the sample, it answers 19 right at the default threshold. Character n-grams can't
+      connect "paisa wapas" to "refund".</p>
+    <div class="console" data-tool="chat2faq"></div>
+    <p class="links"><a href="https://github.com/yashere69/chat2faq">github.com/yashere69/chat2faq</a></p>
+  </article>
+
+  <article class="tool" id="parda" data-tool="parda">
+    <header>
+      <h3>parda</h3><p class="gloss" lang="hi">पर्दा, a curtain</p>
+    </header>
+    <p>Reversible redaction of Indian personal data around an LLM call: Aadhaar (Verhoeff),
+      GSTIN (mod-36), PAN, UPI, phones in Devanagari digits or spoken aloud. It restores
+      values only for tokens it issued, so a model can't make it fill in a value it never
+      saw.</p>
+    <p class="weak"><strong>Where it's weak:</strong> the round-trip numbers come from
+      simulated rewrites, not a real model. On a held-out set, phone recall is 82%
+      (landlines and pair-grouped numbers).</p>
+    <div class="console" data-tool="parda"></div>
+    <p class="links"><a href="https://github.com/yashere69/parda">github.com/yashere69/parda</a></p>
+  </article>
+
+  <article class="tool" id="turncheck" data-tool="turncheck">
+    <header><h3>turncheck</h3></header>
+    <p>Regression tests for WhatsApp bots at the webhook level. It plays Meta's Cloud API:
+      real signed webhooks over HTTP to your bot, then checks replies, tool calls, duplicate
+      deliveries, the 24-hour window and how fast you acknowledge. A planted-bug study
+      catches 9 of 9 bugs with no false failures.</p>
+    <p class="weak"><strong>Where it's weak:</strong> payload shapes come from Meta's docs
+      and an independent framework, never from captured production traffic. A browser
+      can't start your bot, so only <code>lint</code> runs here.</p>
+    <div class="console" data-tool="turncheck"></div>
+    <p class="links"><a href="https://github.com/yashere69/turncheck">github.com/yashere69/turncheck</a></p>
+  </article>
+
+  <article class="tool" id="chatlens" data-tool="chatlens">
+    <header><h3>chatlens</h3></header>
+    <p>A local, keyboard-first page for reading and labelling chatbot conversations during
+      error analysis, then grouping the notes into failure modes. Nothing leaves 127.0.0.1.
+      Its last command exports every failed conversation as a turncheck test, which is the
+      loop the third button runs.</p>
+    <p class="weak"><strong>Where it's weak:</strong> one reviewer at a time, with no
+      adjudication view, and plenty of teams build their own labelling page in an
+      afternoon.</p>
+    <div class="console" data-tool="chatlens"></div>
+    <p class="links"><a href="https://github.com/yashere69/chatlens">github.com/yashere69/chatlens</a></p>
+  </article>
+
+  <article class="tool" id="mixslot" data-tool="mixslot">
+    <header><h3>mixslot</h3></header>
+    <p>Speech recognition garbles Hinglish numbers ("nau aath double saat"), and the voice
+      agent then calls a tool with the wrong order id. mixslot measures how often that
+      happens and normalises spoken numbers in three scripts before extraction, counting a
+      refusal separately from a wrong value.</p>
+    <p class="weak"><strong>Where it's weak:</strong> the synthetic benchmark below is
+      optimistic. On real recogniser output (Whisper base, Hindi TTS) the normaliser raises
+      correct values from 6.6% to 11.1% but doesn't lower wrong ones.</p>
+    <div class="console" data-tool="mixslot"></div>
+    <p class="links"><a href="https://github.com/yashere69/mixslot">github.com/yashere69/mixslot</a></p>
+  </article>
+
+  <article class="tool" id="chunkbench" data-tool="chunkbench">
+    <header><h3>chunkbench</h3></header>
+    <p>Scores RAG chunking strategies on your own documents by token spans (recall,
+      precision, IoU), with BM25 or embeddings. Compare at an equal word budget and the
+      ranking changes, which is the confound it exists to show. Hindi is counted in
+      graphemes.</p>
+    <p class="weak"><strong>Where it's weak:</strong> the sample has 25 questions, so one
+      Hindi question moves a Hindi score by 14 points, and no multilingual embedder has
+      been measured.</p>
+    <div class="console" data-tool="chunkbench"></div>
+    <p class="links"><a href="https://github.com/yashere69/chunkbench">github.com/yashere69/chunkbench</a></p>
+  </article>
+
+  <article class="tool" id="skill-preflight" data-tool="skill-preflight">
+    <header><h3>skill-preflight</h3></header>
+    <p>A check to run before installing an Agent Skill: spec conformance, how much context
+      it costs, what its scripts actually do (read from their syntax tree) against what it
+      declares, and instructions that pipe downloads into a shell or hide things from you.
+      Its lockfile turns an update into a ranked diff.</p>
+    <p class="weak"><strong>Where it's weak:</strong> the instruction rules are line-based
+      and were tuned on the same demo attacks they're reported on. Use it next to a malware
+      scanner, not instead of one.</p>
+    <div class="console" data-tool="skill-preflight"></div>
+    <p class="links"><a href="https://github.com/yashere69/skill-preflight">github.com/yashere69/skill-preflight</a></p>
+  </article>
+
+  <article class="tool" id="shoplint" data-tool="shoplint">
+    <header><h3>shoplint</h3></header>
+    <p>Lints a Shopify product export for what AI shopping agents and product feeds can
+      answer from structured fields, what is buried in prose and what is missing. It reads
+      Shopify's current and legacy CSV templates; 20,800 products take under 4 seconds.</p>
+    <p class="weak"><strong>Where it's weak:</strong> it hasn't been run on a real store's
+      export yet. The sample is a fictional catalog with planted defects.</p>
+    <div class="console" data-tool="shoplint"></div>
+    <p class="links"><a href="https://github.com/yashere69/shoplint">github.com/yashere69/shoplint</a></p>
+  </article>
+</section>
+
+<section class="how" id="how" aria-labelledby="how-title">
+  <h2 id="how-title">How this page works</h2>
+  <div class="how-cols">
+    <div>
+      <p>The consoles run the tools' own command-line entry points in
+        <a href="https://pyodide.org">Pyodide</a>, CPython compiled to WebAssembly, inside
+        a web worker. Each package is built in CI from its repository's release tag, and the
+        page checks every file's sha256 against the build manifest before loading it.</p>
+      <p>The site's tests run every console command in a real browser and in ordinary
+        CPython and fail if the outputs differ, so what you see is what
+        <code>pip install</code> and a terminal would show.</p>
+      <p>Everything loads from this domain: no fonts, scripts or analytics from anywhere
+        else. Add <a href="#debug">#debug</a> to the address to see each request, the frame
+        rate and run timings.</p>
+      <p>The bench is drawn with <a href="https://threejs.org">three.js</a> from plain
+        boxes and cylinders. Bruno Simon's portfolio, where the site itself is the thing you
+        play with, is the reason it exists.</p>
+    </div>
+    <div>
+      <table class="manifest" id="manifest">
+        <caption>What's loaded, from the build manifest</caption>
+        <thead><tr><th scope="col">Package</th><th scope="col">Release</th><th scope="col">Commit</th><th scope="col">Size</th></tr></thead>
+        <tbody><tr><td colspan="4">Reading the manifest…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <p>Yash Sharma, Dehradun. Founder of <a href="https://launch7.in">Launch7</a>; co-runs a
+    women's ethnic-wear label; studies CSE (AI &amp; ML).</p>
+  <p><a href="https://github.com/yashere69/yashere69.github.io">Source for this page</a></p>
+  <p><a href="licenses.txt">Third-party licences</a></p>
+</footer>
+<div class="debug" id="debug" hidden></div>
+</body>
+</html>
