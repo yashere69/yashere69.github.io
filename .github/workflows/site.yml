@@ -1,0 +1,46 @@
+name: site
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: npm ci
+      # clones each tool at the tag in sources.toml and builds its wheel
+      - run: python tools/build.py
+      - run: pip install -r requirements-test.txt dist/py/*.whl
+      - run: python -m playwright install --with-deps chromium
+      # every console in a real browser vs CPython, plus privacy, integrity and a11y checks
+      - run: python -m pytest -q tests
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
