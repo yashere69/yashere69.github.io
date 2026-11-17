@@ -1,0 +1,5 @@
+# For tools/build.py and the tests. The tools themselves are installed from dist/py/.
+pytest==9.2.0
+playwright==1.63.0
+axe-playwright-python==0.1.8
+pyyaml==6.0.3
