@@ -62,19 +62,13 @@ def run(cmd: list[str], cwd: Path | None = None) -> str:
 
 
 def checkout(name: str, tag: str, source_dir: Path | None) -> Path:
+    """A clean checkout of the tag, from GitHub or from a local clone of the repo."""
+    origin = f"https://github.com/{OWNER}/{name}.git"
     if source_dir is not None:
-        repo = source_dir / name
-        exact = run(["git", "describe", "--tags", "--exact-match", "HEAD"], cwd=repo)
-        if exact != tag:
-            sys.exit(f"build: {repo} is at {exact}, sources.toml wants {tag}")
-        dirty = run(["git", "status", "--porcelain"], cwd=repo)
-        if dirty:
-            sys.exit(f"build: {repo} has uncommitted changes")
-        return repo
-    dest = CACHE / "src" / f"{name}-{tag}"
+        origin = (source_dir / name).resolve().as_uri()
+    dest = CACHE / "src" / ("local" if source_dir else "github") / f"{name}-{tag}"
     if not dest.exists():
-        url = f"https://github.com/{OWNER}/{name}.git"
-        run(["git", "clone", "-q", "--depth", "1", "--branch", tag, url, str(dest)])
+        run(["git", "clone", "-q", "--depth", "1", "--branch", tag, origin, str(dest)])
     return dest
 
 
@@ -145,7 +139,7 @@ def copy_examples(name: str, repo: Path, patterns: list[str], out: Path) -> list
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--source-dir", type=Path, help="local checkouts instead of GitHub")
+    ap.add_argument("--source-dir", type=Path, help="local clones of the tools instead of GitHub")
     ap.add_argument("--out", type=Path, default=ROOT / "dist")
     args = ap.parse_args()
 
@@ -178,8 +172,8 @@ def main() -> None:
     pyo.mkdir(parents=True)
     for f in PYODIDE_FILES:
         shutil.copyfile(nm / "pyodide" / f, pyo / f)
-    pyodide_version = json.loads((nm / "pyodide" / "package.json").read_text())["version"]
-    three_version = json.loads((nm / "three" / "package.json").read_text())["version"]
+    pyodide_version = json.loads((nm / "pyodide" / "package.json").read_text(encoding="utf-8"))["version"]
+    three_version = json.loads((nm / "three" / "package.json").read_text(encoding="utf-8"))["version"]
 
     runner = py_dir / "runner.py"
     shutil.copyfile(ROOT / "src" / "runner.py", runner)
@@ -210,7 +204,7 @@ def main() -> None:
     parts.append(f"\n{'=' * 78}\nPyYAML (pure-Python source, py/pyyaml-*-pure.zip)\n{'=' * 78}\n\n{lic}")
     parts.append("\nThe nine tools' wheels under py/ are MIT-licensed; see each repository.\n")
     (out / "licenses.txt").write_text("".join(parts), encoding="utf-8")
-    (out / ".nojekyll").write_text("")
+    (out / ".nojekyll").write_text("", encoding="utf-8")
     total = sum(p.stat().st_size for p in out.rglob("*") if p.is_file())
     print(f"built {out} ({total / 1e6:.1f} MB): pyodide {pyodide_version}, three {three_version}, "
           f"{len(packages)} packages")

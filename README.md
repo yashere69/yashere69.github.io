@@ -69,7 +69,7 @@ npm ci
 python tools/build.py                      # clones the tools from GitHub at their tags
 python -m http.server -d dist 8000         # then open http://localhost:8000
 
-# or build from local checkouts, which must be clean and at the tag in sources.toml
+# or build from local clones of the tools (the tags in sources.toml must exist there)
 python tools/build.py --source-dir ../repos
 ```
 

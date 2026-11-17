@@ -15,11 +15,11 @@ tag = "v0.3.1"
 examples = []
 
 [tools.turncheck]
-tag = "v0.3.1"
+tag = "v0.3.2"
 examples = ["examples/scenarios/*.yaml"]
 
 [tools.chatlens]
-tag = "v0.3.2"
+tag = "v0.3.3"
 examples = ["examples/labels.jsonl", "examples/axial.yaml", "examples/traces.jsonl"]
 
 [tools.skill-preflight]
